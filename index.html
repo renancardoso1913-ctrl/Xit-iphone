@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RenanX Auxílio - Oficial</title>
+    <style>
+        :root { --primary: #9d31ff; --bg-dark: #0f021a; --card-bg: rgba(30, 10, 50, 0.95); }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; user-select: none; }
+        body { background-color: var(--bg-dark); background-image: radial-gradient(circle at center, #2a054d 0%, #0f021a 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: white; overflow: hidden; }
+        
+        .main-panel { display: flex; width: 420px; height: 620px; background: var(--card-bg); border: 1px solid var(--primary); border-radius: 25px; flex-direction: column; overflow: hidden; box-shadow: 0 0 30px rgba(157, 49, 255, 0.3); }
+        .header { padding: 20px; font-weight: 900; font-size: 20px; text-align: center; color: var(--primary); letter-spacing: 2px; border-bottom: 1px solid rgba(157, 49, 255, 0.2); }
+        .wrapper { display: flex; flex: 1; height: calc(100% - 70px); }
+        
+        .sidebar { width: 100px; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 15px; }
+        .tab-btn { width: 75px; height: 75px; border-radius: 18px; background: transparent; border: none; color: #888; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; }
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 0 20px var(--primary); }
+        
+        .content { flex: 1; padding: 20px; display: flex; flex-direction: column; }
+        .tab-content { display: none; height: 100%; }
+        .tab-content.active { display: flex; flex-direction: column; }
+        
+        .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .option-card { background: rgba(15, 5, 25, 0.6); padding: 15px; border-radius: 15px; position: relative; border: 1px solid rgba(157, 49, 255, 0.3); min-height: 85px; font-size: 13px; }
+        .check-circle { width: 26px; height: 26px; border: 2px solid #444; border-radius: 50%; position: absolute; bottom: 12px; right: 12px; cursor: pointer; }
+        .check-circle.active { border-color: var(--primary); background: var(--primary); box-shadow: 0 0 15px var(--primary); }
+        
+        .custom-select { width: 100%; padding: 12px; background: rgba(0,0,0,0.4); color: white; border: 1px solid var(--primary); border-radius: 12px; margin-top: 10px; outline: none; }
+        
+        .inject-area { margin-top: auto; }
+        .progress-container { width: 100%; height: 10px; background: #111; border-radius: 10px; margin-bottom: 12px; display: none; overflow: hidden; border: 1px solid #333; }
+        .progress-bar { width: 0%; height: 100%; background: var(--primary); box-shadow: 0 0 15px var(--primary); transition: 0.1s; }
+        .btn-inject { width: 100%; padding: 18px; background: var(--primary); border: none; border-radius: 20px; color: white; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 13px; }
+        
+        .info-item { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; border-left: 4px solid var(--primary); margin-bottom: 8px; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="main-panel">
+    <div class="header">RENANX AUXÍLIO</div>
+    <div class="wrapper">
+        <div class="sidebar">
+            <div class="tab-btn active" onclick="tab(event, 'aim')">🎯<br>aimbot</div>
+            <div class="tab-btn" onclick="tab(event, 'fps-tab')">⚡<br>FPS</div>
+            <div class="tab-btn" onclick="tab(event, 'info')">ℹ️<br>INFO</div>
+        </div>
+        <div class="content">
+            <div id="aim" class="tab-content active">
+                <div class="option-grid">
+                    <div class="option-card"><span>Truque de mira</span><div class="check-circle" onclick="toggle(this)"></div></div>
+                    <div class="option-card"><span>Sem recuo</span><div class="check-circle" onclick="toggle(this)"></div></div>
+                    <div class="option-card"><span>Precisão</span><div class="check-circle" onclick="toggle(this)"></div></div>
+                    <div class="option-card"><span>AimLock</span><div class="check-circle" onclick="toggle(this)"></div></div>
+                </div>
+                
+                <p style="font-size:11px; margin: 15px 0 5px 0;">FOV DA MIRA: <span id="fov-val">50%</span></p>
+                <input type="range" style="width:100%; accent-color:var(--primary)" min="0" max="100" value="50" oninput="document.getElementById('fov-val').innerText=this.value+'%'">
+
+                <p style="font-size:11px; margin: 10px 0 5px 0;">ALVO DO TIRO:</p>
+                <select class="custom-select">
+                    <option value="head">CABEÇA</option>
+                    <option value="neck">PESCOÇO</option>
+                    <option value="chest">PEITO</option>
+                </select>
+            </div>
+
+            <div id="fps-tab" class="tab-content">
+                <div id="fps-counter" style="font-size:30px; text-align:center; color:var(--primary); margin: 30px 0;">+ 0 FPS</div>
+                <div class="option-card" style="display:flex; justify-content:space-between; align-items:center; min-height:60px;">
+                    <span>Otimizar FPS</span><div id="fps-boost-toggle" class="check-circle" onclick="toggle(this); checkFPSBoost()"></div>
+                </div>
+            </div>
+
+            <div id="info" class="tab-content">
+                <div class="info-item"><b>Criador:</b> RenanX</div>
+                <div class="info-item"><b>Status:</b> <span style="color:#00ff88">ONLINE</span></div>
+                <div class="info-item"><b>Equipa:</b> VIP RENANX</div>
+            </div>
+            
+            <div class="inject-area">
+                <div class="progress-container" id="pContainer">
+                    <div class="progress-bar" id="pBar"></div>
+                </div>
+                <button class="btn-inject" id="btnMain" onclick="injetarEEntrarFF()">INJETAR NO FF</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Funções de Interface
+    function toggle(el) { el.classList.toggle('active'); }
+    function tab(e, n) { 
+        document.querySelectorAll('.tab-content, .tab-btn').forEach(x => x.classList.remove('active'));
+        document.getElementById(n).classList.add('active'); 
+        e.currentTarget.classList.add('active'); 
+    }
+
+    // Lógica de Injeção Sincronizada com Sketchware
+    function injetarEEntrarFF() {
+        const btn = document.getElementById('btnMain');
+        const container = document.getElementById('pContainer');
+        const bar = document.getElementById('pBar');
+        
+        btn.disabled = true;
+        btn.innerText = "INJETANDO...";
+        container.style.display = "block";
+        
+        let width = 0;
+        const intervalo = setInterval(() => {
+            if (width >= 100) {
+                clearInterval(intervalo);
+                width = 100;
+                bar.style.width = "100%";
+                
+                // PEQUENO DELAY PARA O USUÁRIO VER A BARRA CHEIA
+                setTimeout(() => {
+                    // VERIFICA SE A PONTE COM O SKETCHWARE EXISTE
+                    if (window.Android && window.Android.dispararInjecao) {
+                        window.Android.dispararInjecao(); // CHAMA O JAVA DO SKETCHWARE
+                    }
+                    
+                    // RESET DO PAINEL APÓS O JOGO ABRIR
+                    btn.disabled = false;
+                    btn.innerText = "INJETAR NO FF";
+                    container.style.display = "none";
+                    bar.style.width = "0%";
+                }, 600); // 0.6 segundos de delay
+
+            } else {
+                width += Math.random() * 10; // Velocidade da barra
+                if(width > 100) width = 100;
+                bar.style.width = width + "%";
+            }
+        }, 150);
+    }
+
+    // Simulador de FPS
+    let isBoosted = false;
+    function checkFPSBoost() { isBoosted = document.getElementById('fps-boost-toggle').classList.contains('active'); }
+    function updateFPS() {
+        let val = isBoosted ? (Math.floor(Math.random() * 15) + 105) : (Math.floor(Math.random() * 40) + 60);
+        document.getElementById('fps-counter').innerText = `+ ${val} FPS`;
+        setTimeout(updateFPS, 1000);
+    }
+    updateFPS();
+</script>
+</body>
+</html>
