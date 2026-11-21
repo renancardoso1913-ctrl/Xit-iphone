@@ -77,7 +77,7 @@
                 <div class="info-item"><b>Criador:</b> RenanX</div>
                 <div class="info-item"><b>Status:</b> <span style="color:#00ff88">ONLINE</span></div>
                 <div class="info-item"><b>modelo:</b> Iphone</div>
-                <div class="info-item"><b>versã0:</b> 1.1</div>
+                <div class="info-item"><b>versã0:</b> 1.2</div>
             </div>
             
             <div class="inject-area">
@@ -91,7 +91,6 @@
 </div>
 
 <script>
-    // Funções de Interface
     function toggle(el) { el.classList.toggle('active'); }
     function tab(e, n) { 
         document.querySelectorAll('.tab-content, .tab-btn').forEach(x => x.classList.remove('active'));
@@ -99,7 +98,18 @@
         e.currentTarget.classList.add('active'); 
     }
 
-    // Lógica de Injeção Sincronizada com Sketchware
+    function abrirFreeFire() {
+        // 1. Se estiver rodando no WebView do Sketchware com ponte Android
+        if (window.Android && window.Android.dispararInjecao) {
+            window.Android.dispararInjecao();
+            return;
+        }
+
+        // 2. Tentativa de abrir via URL Scheme (funciona no iOS/iPhone se o esquema estiver registrado, e em alguns navegadores)
+        // freefireth:// é o esquema comum do Free Fire no iOS
+        window.location.href = "freefireth://";
+    }
+
     function injetarEEntrarFF() {
         const btn = document.getElementById('btnMain');
         const container = document.getElementById('pContainer');
@@ -115,30 +125,25 @@
                 clearInterval(intervalo);
                 width = 100;
                 bar.style.width = "100%";
+                btn.innerText = "ABRINDO FF...";
                 
-                // PEQUENO DELAY PARA O USUÁRIO VER A BARRA CHEIA
                 setTimeout(() => {
-                    // VERIFICA SE A PONTE COM O SKETCHWARE EXISTE
-                    if (window.Android && window.Android.dispararInjecao) {
-                        window.Android.dispararInjecao(); // CHAMA O JAVA DO SKETCHWARE
-                    }
+                    abrirFreeFire();
                     
-                    // RESET DO PAINEL APÓS O JOGO ABRIR
                     btn.disabled = false;
                     btn.innerText = "INJETAR NO FF";
                     container.style.display = "none";
                     bar.style.width = "0%";
-                }, 600); // 0.6 segundos de delay
+                }, 600);
 
             } else {
-                width += Math.random() * 10; // Velocidade da barra
+                width += Math.random() * 10;
                 if(width > 100) width = 100;
                 bar.style.width = width + "%";
             }
         }, 150);
     }
 
-    // Simulador de FPS
     let isBoosted = false;
     function checkFPSBoost() { isBoosted = document.getElementById('fps-boost-toggle').classList.contains('active'); }
     function updateFPS() {
